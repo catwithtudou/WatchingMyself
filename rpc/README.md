@@ -2,7 +2,7 @@
 
 ## Reading
 
-- [ ] Go Rpc([源码地址](https://github.com/golang/go/tree/master/src/net/rpc))
+- [x] Go Rpc[[源码地址]](https://github.com/golang/go/tree/master/src/net/rpc) [[源码分析]](https://github.com/catwithtudou/WatchingMyself/blob/master/rpc/netrpc-reading.md)
 - [ ] gorpc
 - [ ] rpcx
 - [ ] begonia
