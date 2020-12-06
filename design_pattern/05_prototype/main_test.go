@@ -11,6 +11,12 @@ import (
 
 var manager *PrototypeManager
 
+func init(){
+	manager=NewPrototypeManager()
+	manager.Set("t1",&Type1{name: "type1"})
+	manager.Set("t2",&Type2{name:"type2"})
+}
+
 type Type1 struct{
 	name string
 }
@@ -33,6 +39,8 @@ func TestClone(t *testing.T){
 	t1:=manager.Get("t1")
 
 	t2:=t1.Clone()
+
+
 
 	if t1==t2{
 		t.Fatal("error!")
