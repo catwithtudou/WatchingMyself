@@ -14,3 +14,4 @@
 **结构型模式**：
 
 - [Facade](./07_facade)
+- [Adapter](./08_adapter)
