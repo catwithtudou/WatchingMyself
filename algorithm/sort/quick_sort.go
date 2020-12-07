@@ -31,3 +31,25 @@ func QuickSort(arr []int,start,end int){
 	}
 
 }
+
+func QuickSortA(arr []int,start,end int){
+	if start>=end{
+		return
+	}
+	partition:=Partition(arr,start,end)
+	QuickSort(arr,start,partition-1)
+	QuickSort(arr,partition+1,end)
+}
+
+func Partition(arr []int,start,end int)int{
+	pivot:=arr[end]
+	i,j:=start,start
+	for ;j<end;j++{
+		if arr[j]<pivot{
+			arr[i],arr[j]=arr[j],arr[i]
+			i++
+		}
+	}
+	arr[i],arr[j]=arr[j],arr[i]
+	return i
+}
