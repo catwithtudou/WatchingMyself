@@ -1,5 +1,7 @@
 [TOC]
 
+> 以下为鸟窝大佬的[Go 并发编程实战课](https://time.geekbang.org/column/intro/100061801) 中摘录的笔记
+
 # Mutex
 
 同步原语的使用场景：
@@ -29,31 +31,31 @@ func semacquire(*int32)
 func semrelease(*int32)
 // 互斥锁的结构，包含两个字段
 type Mutex struct {
-	key int32 // 锁是否被持有的标识
-	sema int32 // 信号量专用，用以阻塞/唤醒goroutine
+key int32 // 锁是否被持有的标识
+sema int32 // 信号量专用，用以阻塞/唤醒goroutine
 }
 // 保证成功在val上增加delta的值
 func xadd(val *int32, delta int32) (new int32) {
-	for {
-		v := *val
-		if cas(val, v, v+delta) {
-			return v + delta
-		}
-	}
-	panic("unreached")
+for {
+v := *val
+if cas(val, v, v+delta) {
+return v + delta
+}
+}
+panic("unreached")
 }
 // 请求锁
 func (m *Mutex) Lock() {
-	if xadd(&m.key, 1) == 1 { //标识加1，如果等于1，成功获取到锁
-	return
+if xadd(&m.key, 1) == 1 { //标识加1，如果等于1，成功获取到锁
+return
 }
-	semacquire(&m.sema) // 否则阻塞等待
+semacquire(&m.sema) // 否则阻塞等待
 }
 func (m *Mutex) Unlock() {
-	if xadd(&m.key, -1) == 0 { // 将标识减去1，如果等于0，则没有其它等待者
-	return
+if xadd(&m.key, -1) == 0 { // 将标识减去1，如果等于0，则没有其它等待者
+return
 }
-	semrelease(&m.sema) // 唤醒其它阻塞的goroutine
+semrelease(&m.sema) // 唤醒其它阻塞的goroutine
 }
 ```
 
@@ -73,30 +75,30 @@ func (m *Mutex) Unlock() {
 
 ```go
 func (m *Mutex) Lock() {
-	// Fast path: 幸运case，能够直接获取到锁
-	if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
-		return
-	}
-	awoke := false
-	for {
-		old := m.state
-		new := old | mutexLocked // 新状态加锁
-		if old&mutexLocked != 0 {
-			new = old + 1<<mutexWaiterShift //等待者数量加一
-		}
-		if awoke {
-			// goroutine是被唤醒的，
-			// 新状态清除唤醒标志
-			new &^= mutexWoken
-		}
-		if atomic.CompareAndSwapInt32(&m.state, old, new) {//设置新状态
-			if old&mutexLocked == 0 { // 锁原状态未加锁
-				break
-			}
-			runtime.Semacquire(&m.sema) // 请求信号量
-			awoke = true
-		}
-	}
+// Fast path: 幸运case，能够直接获取到锁
+if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
+return
+}
+awoke := false
+for {
+old := m.state
+new := old | mutexLocked // 新状态加锁
+if old&mutexLocked != 0 {
+new = old + 1<<mutexWaiterShift //等待者数量加一
+}
+if awoke {
+// goroutine是被唤醒的，
+// 新状态清除唤醒标志
+new &^= mutexWoken
+}
+if atomic.CompareAndSwapInt32(&m.state, old, new) {//设置新状态
+if old&mutexLocked == 0 { // 锁原状态未加锁
+break
+}
+runtime.Semacquire(&m.sema) // 请求信号量
+awoke = true
+}
+}
 }
 ```
 
@@ -107,29 +109,29 @@ func (m *Mutex) Lock() {
 
 ```go
 func (m *Mutex) Unlock() {
-	// Fast path: drop lock bit.
-	new := atomic.AddInt32(&m.state, -mutexLocked) //去掉锁标志
-	if (new+mutexLocked)&mutexLocked == 0 { //本来就没有加锁
-		panic("sync: unlock of unlocked mutex")
-	}
-	old := new
-	for {
-		if old>>mutexWaiterShift == 0 || old&(mutexLocked|mutexWoken) != 0
-		return
-	}
-	new = (old - 1<<mutexWaiterShift) | mutexWoken // 新状态，准备唤醒goroutine
-	if atomic.CompareAndSwapInt32(&m.state, old, new) {
-		runtime.Semrelease(&m.sema)
-		return
-	}
-	old = m.state
+// Fast path: drop lock bit.
+new := atomic.AddInt32(&m.state, -mutexLocked) //去掉锁标志
+if (new+mutexLocked)&mutexLocked == 0 { //本来就没有加锁
+panic("sync: unlock of unlocked mutex")
+}
+old := new
+for {
+if old>>mutexWaiterShift == 0 || old&(mutexLocked|mutexWoken) != 0
+return
+}
+new = (old - 1<<mutexWaiterShift) | mutexWoken // 新状态，准备唤醒goroutine
+if atomic.CompareAndSwapInt32(&m.state, old, new) {
+runtime.Semrelease(&m.sema)
+return
+}
+old = m.state
 }
 ```
 
 - 若没有锁的情况下进行Unlock则直接panic；
 - 若有锁的情况下有两种情况：
-    - 若没有waiter，则直接返回；
-    - 若有waiter，且没有被唤醒，则需要唤醒一个等待的waiter；
+  - 若没有waiter，则直接返回；
+  - 若有waiter，且没有被唤醒，则需要唤醒一个等待的waiter；
 
 相对于初版的设计，这次改动主要就是**新来的goroutine有机会先获取到锁**。
 
@@ -139,41 +141,41 @@ func (m *Mutex) Unlock() {
 
 ```go
 func (m *Mutex) Lock() {
-	// Fast path: 幸运之路，正好获取到锁
-	if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
-		return
-	}
-	awoke := false
-	iter := 0
-	for { // 不管是新来的请求锁的goroutine, 还是被唤醒的goroutine，都不断尝试请求锁
-		old := m.state // 先保存当前锁的状态
-		new := old | mutexLocked // 新状态设置加锁标志
-		if old&mutexLocked != 0 { // 锁还没被释放
-			if runtime_canSpin(iter) { // 还可以自旋
-				if !awoke && old&mutexWoken == 0 && old>>mutexWaiterShift
-					atomic.CompareAndSwapInt32(&m.state, old, old|mutexWok
-				awoke = true
-			}
-			runtime_doSpin()
-			iter++
-			continue // 自旋，再次尝试请求锁
-		}
-		new = old + 1<<mutexWaiterShift
-	}
-	if awoke { // 唤醒状态
-		if new&mutexWoken == 0 {
-			panic("sync: inconsistent mutex state")
-		}
-		new &^= mutexWoken // 新状态清除唤醒标记
-	}
-	if atomic.CompareAndSwapInt32(&m.state, old, new) {
-		if old&mutexLocked == 0 { // 旧状态锁已释放，新状态成功持有了锁，直接返回
-			break
-		}
-		runtime_Semacquire(&m.sema) // 阻塞等待
-		awoke = true // 被唤醒
-		iter = 0
-	}
+// Fast path: 幸运之路，正好获取到锁
+if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
+return
+}
+awoke := false
+iter := 0
+for { // 不管是新来的请求锁的goroutine, 还是被唤醒的goroutine，都不断尝试请求锁
+old := m.state // 先保存当前锁的状态
+new := old | mutexLocked // 新状态设置加锁标志
+if old&mutexLocked != 0 { // 锁还没被释放
+if runtime_canSpin(iter) { // 还可以自旋
+if !awoke && old&mutexWoken == 0 && old>>mutexWaiterShift
+atomic.CompareAndSwapInt32(&m.state, old, old|mutexWok
+awoke = true
+}
+runtime_doSpin()
+iter++
+continue // 自旋，再次尝试请求锁
+}
+new = old + 1<<mutexWaiterShift
+}
+if awoke { // 唤醒状态
+if new&mutexWoken == 0 {
+panic("sync: inconsistent mutex state")
+}
+new &^= mutexWoken // 新状态清除唤醒标记
+}
+if atomic.CompareAndSwapInt32(&m.state, old, new) {
+if old&mutexLocked == 0 { // 旧状态锁已释放，新状态成功持有了锁，直接返回
+break
+}
+runtime_Semacquire(&m.sema) // 阻塞等待
+awoke = true // 被唤醒
+iter = 0
+}
 }
 ```
 
@@ -198,5 +200,36 @@ Mutex让每一个goroutine都有机会获取到锁，而且它也尽可能地让
 - 正常模式下，waiter 都是进入先入先出队列，被唤醒的 waiter 并不会直接持有锁，而是要和新来的 goroutine 进行竞争。新来的 goroutine有先天的优势，它们正在CPU中运行，可能它们的数量还不少，所以在高并发情况下，被唤醒的waiter可能比较悲剧地获取不到锁，这时，它会被插入到队列的前面。如果waite 获取不到锁的时间超过阈值1毫秒，那么，这个Mutex就进入到了饥饿模式。
 - 在饥饿模式下，Mutex的拥有者将直接把锁交给队列最前面的 waiter。新来的goroutine不会尝试获取锁，即使看起来锁没有被持有，它也不会去抢，也不会spin，它会乖乖地加入到等待队列的尾部。
 - 如果拥有 Mutex 的 waiter 发现下面两种情况的其中之一，它就会把这个 Mutex 转换成正常模式
-    - 正常模式拥有更好的性能，因为即使有等待抢锁的 waiter，goroutine 也可以连续多次获取到锁。
-    - 饥饿模式是对公平性和性能的一种平衡，它避免了某些 goroutine 长时间的等待锁。在饥饿模式下，优先对待的是那些一直在等待的waiter。
+  - 正常模式拥有更好的性能，因为即使有等待抢锁的 waiter，goroutine 也可以连续多次获取到锁。
+  - 饥饿模式是对公平性和性能的一种平衡，它避免了某些 goroutine 长时间的等待锁。在饥饿模式下，优先对待的是那些一直在等待的waiter。
+
+## 常用错误场景
+
+### Lock/Unlock不是成对出现
+
+若Lock/Unlock没有成对出现，则会出现死锁的情况，或者是因为Unlock一个未加锁的Mutex而导致panic。
+
+### Copy已使用的Mutex
+
+Package sync的同步原语在使用后是不能复制的，因为Mutex是一个有状态的对象，它的state字段会记录这个锁的状态。
+
+> Go在运行时会有死锁的检查机制（checkdead()方法），能够发现死锁的goroutine。
+>
+> vet工具可以检查同步原语。也可以使用第三方库进行检查。
+
+### 重入
+
+> 可重入锁（递归锁）：当一个线程获取锁时，如果没有其它线程拥有这个锁，那么，这个线程就成功获取到这个锁。之后，如果其它线程再请求这个锁，就会处于阻塞等待的状态。但是，如果拥有这把锁的线程再请求这把锁的话，不会阻塞，而是成功返回。
+>
+> 在通过递归实现一些算法时，调用者不会阻塞或者死锁。
+
+**Mutex不是可重入锁**。Mutex实现没有记录goroutine是否拥有该锁。
+
+若要实现可重入锁，则需要记录持有该锁的goroutine标识。
+
+### 死锁
+
+> 死锁：两个及以上的进程或线程在执行过程中，因争夺共享资源而处于一种互相等待的状态，若无外部干涉则会无法推进下去。
+
+- 可引入第三方的锁来依赖这个锁进行业务处理，避免出现死锁。
+

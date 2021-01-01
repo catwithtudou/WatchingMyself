@@ -21,6 +21,7 @@ require (
 	github.com/jonboulle/clockwork v0.2.1 // indirect
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.4 // indirect
+	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/soheilhy/cmux v0.1.4 // indirect
