@@ -2,6 +2,8 @@
 
 > 以下为鸟窝大佬的[Go 并发编程实战课](https://time.geekbang.org/column/intro/100061801) 中摘录的笔记
 
+![image-20210103003621340](http://img.zhengyua.cn/img/20210103003621.png)
+
 # Mutex
 
 同步原语的使用场景：
