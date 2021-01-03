@@ -17,6 +17,8 @@
 
 - git
 
+- other
+
 - read
 
 - rpc
@@ -26,3 +28,5 @@
 - software_basis
 
 - sync
+
+- test
