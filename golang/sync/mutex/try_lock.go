@@ -35,7 +35,7 @@ func (m *Mutex)Count()int{
 //tryLock实现
 func (m *Mutex)TryLock()bool{
 	//fast path
-	if atomic.CompareAndSwapInt32((*int32)(unsafe.Pointer(&m.Mutex)),0,mutexLocked){
+	if atomic.CompareAndSwapInt32((*int32)(unsafe.Pointer(&m.Mutex)),0, mutexLocked){
 		return true
 	}
 

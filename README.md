@@ -17,6 +17,8 @@
 
 - git
 
+- golang
+
 - other
 
 - read
@@ -26,7 +28,5 @@
 - socks5
 
 - software_basis
-
-- sync
 
 - test

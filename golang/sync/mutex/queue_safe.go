@@ -13,7 +13,7 @@ type SliceQueue struct {
 	data []interface{}
 }
 
-func NewSliceQueue(n int)*SliceQueue  {
+func NewSliceQueue(n int)*SliceQueue {
 	return &SliceQueue{
 		data: make([]interface{},0,n),
 	}
