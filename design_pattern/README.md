@@ -15,3 +15,5 @@
 
 - [Facade](./07_facade)
 - [Adapter](./08_adapter)
+- [Proxy](./09_proxy)
+- [Composite](./10_composite)
