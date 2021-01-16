@@ -17,3 +17,4 @@
 - [Adapter](./08_adapter)
 - [Proxy](./09_proxy)
 - [Composite](./10_composite)
+- [Flyweight](./11_flyweight)
