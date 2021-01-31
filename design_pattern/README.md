@@ -18,3 +18,5 @@
 - [Proxy](./09_proxy)
 - [Composite](./10_composite)
 - [Flyweight](./11_flyweight)
+- [Decorator](./12_decorator)
+- [Bridge](./13_bridge)
