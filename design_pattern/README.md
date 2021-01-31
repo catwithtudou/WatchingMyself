@@ -20,3 +20,14 @@
 - [Flyweight](./11_flyweight)
 - [Decorator](./12_decorator)
 - [Bridge](./13_bridge)
+
+**行为型模式**
+
+- [Mediator](./14_mediator)
+- [Observer](./15_Observer)
+- [Command](./16_command)
+- [Iterator](./17_iterator)
+- [Template Method](./18_template_method)
+- [Strategy](./19_strategy)
+- [State](./20_state)
+- [Memento](./21_memento)
