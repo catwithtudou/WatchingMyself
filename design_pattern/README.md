@@ -31,3 +31,6 @@
 - [Strategy](./19_strategy)
 - [State](./20_state)
 - [Memento](./21_memento)
+- [Interpreter](./22_Interpreter)
+- [ChainOfResponsibility](./23_chain_of_responsibility)
+- [Visitor](./24_visitor)
