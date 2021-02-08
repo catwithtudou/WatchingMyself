@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 /**
@@ -12,9 +13,11 @@ import (
 
 
 func TestUintNum(t *testing.T){
-	var a uint8 = 1
-	var b uint8 = 255
-	fmt.Println("result:",a+b)
+	tick:=int64(time.Now().Unix()) / 10
+	fmt.Printf("%d\n",tick)
+	time.Sleep(7*time.Second)
+	tick=int64(time.Now().Unix()) / 10
+	fmt.Printf("%d\n",tick)
 }
 
 func TestSliceMap(t *testing.T){
@@ -29,3 +32,4 @@ func TestSliceMap(t *testing.T){
 	fmt.Println(a["1"])
 	fmt.Println(b)
 }
+

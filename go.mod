@@ -3,6 +3,7 @@ module WatchingMyself
 go 1.14
 
 require (
+	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129
 	github.com/coreos/bbolt v1.3.3 // indirect
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-semver v0.3.0 // indirect
