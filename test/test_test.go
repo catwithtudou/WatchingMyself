@@ -33,3 +33,10 @@ func TestSliceMap(t *testing.T){
 	fmt.Println(b)
 }
 
+func TestSliceAppend(t *testing.T){
+	a:=make([]string,0)
+	b:=[]string{"byte","dance"}
+	a=append(a,b...)
+	fmt.Println(a)
+}
+
