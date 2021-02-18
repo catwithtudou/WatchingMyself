@@ -34,6 +34,8 @@ type OperatorFactory interface {
 }
 
 //抽象的Operator和其工厂接口已经封装好了，接下来就是实现具体Operator和其工厂接口
+
+
 type PlusOperatorFactory struct{}
 
 func (PlusOperatorFactory)Create()Operator{

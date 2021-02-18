@@ -17,7 +17,6 @@
 - [Adapter](./08_adapter)
 - [Proxy](./09_proxy)
 - [Composite](./10_composite)
-<<<<<<< HEAD
 - [Flyweight](./11_flyweight)
 - [Decorator](./12_decorator)
 - [Bridge](./13_bridge)
@@ -35,6 +34,3 @@
 - [Interpreter](./22_Interpreter)
 - [ChainOfResponsibility](./23_chain_of_responsibility)
 - [Visitor](./24_visitor)
-=======
-- [Flyweight](./11_flyweight)
->>>>>>> parent of 913ac3b... update the design pattern
