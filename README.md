@@ -25,6 +25,8 @@
 
 - rpc
 
+- rust
+
 - socks5
 
 - software_basis
