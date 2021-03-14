@@ -114,7 +114,7 @@ func (m *Mutex) Unlock() {
 // Fast path: drop lock bit.
 new := atomic.AddInt32(&m.state, -mutexLocked) //去掉锁标志
 if (new+mutexLocked)&mutexLocked == 0 { //本来就没有加锁
-panic("sync: unlock of unlocked mutex")
+panic("concurrent_programming: unlock of unlocked mutex")
 }
 old := new
 for {
@@ -166,7 +166,7 @@ new = old + 1<<mutexWaiterShift
 }
 if awoke { // 唤醒状态
 if new&mutexWoken == 0 {
-panic("sync: inconsistent mutex state")
+panic("concurrent_programming: inconsistent mutex state")
 }
 new &^= mutexWoken // 新状态清除唤醒标记
 }

@@ -18,7 +18,11 @@
   - 次版本号：当做了向下兼容的功能性新增；
   - 修订号：当做了向下兼容的问题修正；
 
+2. 发行版本
+
 ![image-20210225201734434](http://img.zhengyua.cn/20210225201734.png)
+
+3. Edition版次
 
 ![image-20210225201750210](http://img.zhengyua.cn/20210225201750.png)
 
@@ -70,21 +74,20 @@
 
 5. **词条**
 
-1. 语言项（item）
-2. 块（block）
-3. 语句（Stmt）
-4. 表达式 （Expr）
-5. 模式（Pattern）
-6. 关键字（Keyword）
-7. 标识符（Ident）
-8. 字面量（Literal）
-9. 生命周期（Lifetime）
-
-10. 可见性（Vis）
-11. 标点符号（Punctuation）
-12. 分隔符（delimiter）
-13. 词条树（Token Tree）
-14. 属性（Attribute）
+- 语言项（item）
+- 块（block）
+- 语句（Stmt）
+- 表达式 （Expr）
+- 模式（Pattern）
+- 关键字（Keyword）
+- 标识符（Ident）
+- 字面量（Literal）
+- 生命周期（Lifetime）
+- 可见性（Vis）
+- 标点符号（Punctuation）
+- 分隔符（delimiter）
+- 词条树（Token Tree）
+- 属性（Attribute）
 
 6. **路径**
 
@@ -135,19 +138,19 @@ Rust 为面向表达式的语言，借鉴了函数式语言，面向表达式。
 
 ```Rust
 fn main() {
-    ;
-    ;
-    {
-        ()
-    }
-    {
-        ();
-        use std::vec::Vec;
-    }
+  ;
+  ;
+  {
+    ()
+  }
+  {
     ();
-    &{;}; // -> &()
-    ;     // -> ()
-    ;
+    use std::vec::Vec;
+  }
+  ();
+  &{;}; // -> &()
+  ;     // -> ()
+  ;
 }
 ```
 
@@ -163,4 +166,442 @@ fn main() {
 
 **除了基本的声明语句，其他皆为表达式**。
 
+### 编译期计算
 
+> 编译期计算：最先由 Lisp/Cpp 语言支持，CTFE（compile time function evaluation）。
+
+编译期计算 Rust 支持两种方式：
+
+- 过程宏 + Build 脚本（build.rs）
+- 类似于 Cpp 中 constexpr 的 CTFE 功能
+
+Rust 中的 CTFE：
+
+- 常量函数（const fn）
+- 常量泛型（const generic）
+
+#### 常量函数 const fn
+
+常量表达式与常量上下文：
+
+![image-20210226143751336](http://img.zhengyua.cn/20210226143751.png)
+
+```rust
+fn main(){
+  let an = (42,).0;
+  const AN:i32 = an; // Error: attempt to use a non-constant value in a constant
+  // fixed error:
+  const AN:i32 = (42,).0;
+}
+```
+
+**常量上下文（const context）**包含：
+
+1. 常量值初始化位置
+2. 静态数组的长度表达式，[T; N]
+3. 重复的长度表达式，类似于：[0; 10]
+4. 静态变量、枚举判别式的初始化位置
+
+我们需要注意：
+
+- 常量上下文是编译器唯一运行进行编译期求值的地方
+- 在非常量上下文的地方，常量表达式不一定会在编译期求值
+
+#### 常量传播（Const Propagation）
+
+常量传播和编译期计算是不同的：
+
+1. 常量传播是编译器的一种优化；
+2. 常量传播并不能改变程序的任何行为，并且对开发者是隐藏的；
+3. 编译期计算则是指编译时执行的代码，必须知道其结果，才能继续执行；
+
+```rust
+const X:u32 = 3 + 4; // CTFE
+let x:uew = 4 + 3; // 不是 CTFE，但可能会被常量传播优化，因为它不在常量上下文
+```
+
+#### 常量安全（Const Safe）
+
+1. Rust 里的大部分表达式都可用作常量表达式；
+2. 并不是所有常量表达式都可以用在常量上下文；
+3. 编译期求值必须得到一个确定性的结果；
+
+```rust
+const fn gcd(a:u32,b:u32)->u32{
+    match (a,b) {
+        (x,0)|(0,x) => x,
+
+        (x,y) if x % 2 == 0 && y % 2 ==0 => 2 * gcd(x/2,y/2),
+        (x,y) | (y,x) if x % 2 == 0 => gcd(x/2,y),
+
+        (x,y) if x < y => gcd((y-x)/2,x),
+        (x,y) => gcd((x-y)/2,y),
+    }
+}
+
+const GCD : u32 = gcd(21,7);
+
+fn main() {
+    println!("{}",GCD);
+}
+```
+
+```rust
+const fn fib(n:u128)->u128{
+    const fn helper(n:u128,a:u128,b:u128,i:u128)->u128{
+        if i<=n {
+            helper(n,b,a+b,i+1)
+        }else{
+            b
+        }
+    }
+    helper(n,1,1,2)
+}
+
+const X:u128 = fib(10);
+
+fn main() {
+    println!("{}",GCD);
+}
+```
+
+**常量安全子类型系统**：
+
+1. 普通的 fn 关键字定义的函数，是 Safe Rust 主类型系统保证安全。
+2. const fn 定义的函数，是 Safe Rust 主类型系统下有一个专门用于常量计算的子类型系统来保证常量安全。
+
+#### 常量上下文可接受的常量表达式
+
+1. const fn 函数
+2. 元组结构体
+3. 元组的值
+
+```rust
+// Error
+const fn hello()->String{
+  "Hello".to_string()
+}
+
+// Error
+const S : String = hello();
+
+
+// Correct
+const fn hello()->&'static str{
+  "Hello"
+}
+
+// Correct
+const Y: &str = hello();
+
+fn main(){
+  println!("{:?}",S);
+}
+```
+
+```rust
+#[derive(Debug)]
+
+struct Answer(u32);
+const A:Answer = Answer(42);
+
+fn main(){
+  println!("{}",A);
+}
+```
+
+#### 编译期计算如何实现
+
+- MIR（中级中间语言）
+- Miri（编译期内置 MIR 解释器）
+
+![image-20210226151316469](http://img.zhengyua.cn/20210226151316.png)
+
+
+
+比如下面的代码在编译期：
+
+```rust
+const fn answer() -> u32 {42}
+
+const A:u32 = answer();
+
+fn main(){
+  let a = A;
+}
+```
+
+![image-20210226151754832](http://img.zhengyua.cn/20210226151754.png)
+
+其 Miri 中求值主要过程为：
+
+- const A 赋值
+- 在 bb0 中调用 const answer
+- const answer 返回常量 42
+- 流程跳到 bb1
+- 返回42
+
+#### While true vs loop
+
+- 想使用无限循环的时候建议使用 loop，而非 while true
+
+```rust
+fn main(){
+  let mut a;
+  while true{
+    a=1;
+    break;
+  }
+  
+  println!("{}",a); // Error
+}
+```
+
+```rust
+fn main(){
+  let mut a;
+  loop{
+    a = 1;
+    break;
+  }
+  println!("{}",a);
+}
+```
+
+关于编译期为什么不识别 while true 主要有以下原因：
+
+- 要考虑：`while(constexpr = true)`的情况；
+- 使用 `#[allow(while_true)]`属性在某些情况下允许使用 while true（上面的例子不符合使用情况）；
+
+### 常量泛型 const generic
+
+Rust 中的静态数组一直以来都属于“二等公民”，不方便使用。
+
+```rust
+#![feature(min_const_generics)]
+
+use core::mem::MaybeUninit;
+
+const X:u128 = fib(10);
+
+pub struct ArrayVec<T, const N: usize> {
+    items: [MaybeUninit<T>; N],
+    length: usize,
+}
+```
+
+目前存在的缺陷：
+
+1. 目前仅限于整数原生类型，包括有符号和无符号整数类型，布尔值和字符还不允许使用复合类型和自定义类型，也不允许使用引用，即意味着不允许使用字符串；
+2. 常量泛型参数目前只支持两种表达式：
+- 一个简单的常量泛型参数
+- 可以在不依赖于任何类型或常量参数的常量上下文中使用的表达式
+
+#### 类型理论
+
+常量泛型是一种依赖类型（Depended Type）
+
+因为数组 [T;N] 的类型，最终是要依赖于 N 的具体值来确定。
+
+```rust
+#![feature(min_const_generics)]
+#![feature(const_in_array_repeat_expressions)]
+
+use core::mem::MaybeUninit;
+
+#[derive(Debug)]
+pub struct ArrayVec<T, const N: usize> {
+    items: [MaybeUninit<T>; N],
+    length: usize,
+}
+
+impl<T,const N:usize> ArrayVec<T,{N}>{
+    pub const fn new()->ArrayVec<T,{N}>{
+        ArrayVec{
+            items:[MaybeUninit::uninit();N],
+            length:0,
+        }
+    }
+    
+    #[inline]
+    pub const fn len(&self) -> usize { self.length}
+    
+    #[inline]
+    pub const fn is_empty(&self) -> bool { self.len() == 0}
+    
+    #[inline]
+    pub const fn capacity(&self) -> usize { N}
+    
+    #[inline]
+    pub const fn is_full(&self) -> bool { self.len() >= self.capacity()}
+}
+```
+
+## 从表达式的分类角度来看 Rust 的变量绑定和引用
+
+### Rust 中表达式的分类
+
+- **位置表达式&值表达式**
+
+![image-20210314205032494](http://img.zhengyua.cn/20210314205032.png)
+
+- **表达式背后的内存管理**
+
+![image-20210314205143626](http://img.zhengyua.cn/20210314205143.png)
+
+- **let 绑定**
+
+![image-20210314205342795](http://img.zhengyua.cn/20210314205342.png)
+
+- **位置表达式包括以下：**
+
+1. 静态变量初始化：
+
+   `static mut LEVELS:u32 = 0;`
+
+2. 解引用表达式：
+
+   `*expr`
+
+3. 数组索引表达：
+
+   `express[expr]`
+
+4. 字段表达式：
+
+   `expr.field`
+
+5. 以及上述加上括号的位置表达式：
+
+   `(expr)`
+
+除此之外的都是值表达式。
+
+- **位置上下文**
+
+1. 除了赋值左侧的位置上下文之外，还有复合赋值操作的左侧；
+
+```rust
+let mut a = 1;
+a += 1;
+```
+
+2. 一元借用和解引用操作中的操作数所在区域；
+
+```rust
+let a = & mut 7;
+*a = 42;
+let b = &a;
+```
+
+3. 字段表达式的操作数所在区域
+
+```rust
+struct A{
+  name:&'static str,
+} 
+
+let a = A{name:"Alex"};
+a.name;
+```
+
+4. 数组索引表达式的操作数所在区域
+
+```rust
+let mut a = [1,2,3];
+let b = &mut a;
+a[1] = 42;
+```
+
+5. 任意隐式借用操作数所在区域
+
+```rust
+let mut v = vec![1,2,3];
+v.push(4);
+```
+
+6. let 语句初始化
+
+```rust
+let a:i32;
+a = 42;
+```
+
+7. if let / while let / match 的匹配表达式所在区域
+
+```rust
+let dish = {"Ham","Eggs"};
+
+if let ("Bacon", b) = dish{ // 匹配表达式所在区域就是位置上下文
+		println!("Bacon is serverd with {}",b);
+} else {
+    println!("No bacon will be served");
+}
+
+// while let (位置上下文) = ... { ... }
+// match (位置上下文) { ... }
+```
+
+8. 结构体更新语法中的 base 表达式（ `..`操作符后面的操作数区域）
+
+```rust
+let mut base = Point3d{x:1,y:2,z:3};
+let y_ref = &mut base.y;
+Point3d{y:0,z:10,..base}; // 得到 base.x
+```
+
+### Rust 所有权语义在表达式上的体现
+
+- Copy 语义代表可以**安全在栈内存复制**
+
+![image-20210314212259500](http://img.zhengyua.cn/20210314212259.png)
+
+- Move 语义代表必须**旧的绑定失效**，避免内存不安全
+
+![image-20210314212337679](http://img.zhengyua.cn/20210314212337.png)
+
+### 不可变与可变
+
+Rust 借鉴了函数式语言的**不可变特性**，包括：
+
+- 不可变绑定与可变绑定
+- 不可变引用与可变引用
+
+1. **不可变绑定与可变绑定**
+
+默认不可变：
+
+![image-20210314212454499](http://img.zhengyua.cn/20210314212454.png)
+
+如果想修改变量的值：
+
+```rust
+let answer = 42;
+
+let answer = 44;
+
+// 这种方式也叫变量遮蔽
+```
+
+可变绑定使用 mut 修饰符：
+
+![image-20210314212602601](http://img.zhengyua.cn/20210314212602.png)
+
+2. **不可变引用与可变引用**
+
+不可变引用也叫做共享引用：
+
+![image-20210314212635218](http://img.zhengyua.cn/20210314212635.png)
+
+同样可变引用使用 mut 修饰引用：
+
+```rust
+let mut answer = 42;
+let r = &mut answer;
+*r = 43;
+println!("{:?}",answer); // 43
+```
+
+可变引用也叫独占引用：
+
+![image-20210314212741259](http://img.zhengyua.cn/20210314212741.png)
