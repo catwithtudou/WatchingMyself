@@ -5,18 +5,18 @@
 ## Rust语言版本说明
 
 - Rust语言的版本包括以下三个相互正交的概念：
-  - 语义化版本（Sem Ver，Semantic Versioning）
-  - 发行版本
-  - Edition版次
+    - 语义化版本（Sem Ver，Semantic Versioning）
+    - 发行版本
+    - Edition版次
 
 1. **语义化版本（Sem Ver, Semantic versioning）**
 
 其格式为：`主版本号.次版本号.修订号`
 
 - 语义版本号递增规则：
-  - 主版本号：当做了不兼容的API修改；
-  - 次版本号：当做了向下兼容的功能性新增；
-  - 修订号：当做了向下兼容的问题修正；
+    - 主版本号：当做了不兼容的API修改；
+    - 次版本号：当做了向下兼容的功能性新增；
+    - 修订号：当做了向下兼容的问题修正；
 
 2. 发行版本
 
@@ -48,14 +48,14 @@
 1. **关键字**
 
 - 严格关键字（Strict）
-  - as/ break/ const/ continue/ crate/ if/ else/ struct/ enum/ true/ false/ fn/ for/ in/ let/ loop/ impl/ mod/ match/ move / mut /pub/ ref/ return/ self/ Self/ static/ super/ trait/ type/ unsafe/ use/ where/ while /async/ await/ dyn / main
+    - as/ break/ const/ continue/ crate/ if/ else/ struct/ enum/ true/ false/ fn/ for/ in/ let/ loop/ impl/ mod/ match/ move / mut /pub/ ref/ return/ self/ Self/ static/ super/ trait/ type/ unsafe/ use/ where/ while /async/ await/ dyn / main
 - 保留字（Reserved）
-  - abstract/ become/ box/ do/ final/ macro/ override/ priv/ typeof/ unsized/ virtual/ yield / try
-  - 被保留的关键字不代表将来一定会使用
+    - abstract/ become/ box/ do/ final/ macro/ override/ priv/ typeof/ unsized/ virtual/ yield / try
+    - 被保留的关键字不代表将来一定会使用
 - 弱关键字（Weak）
-  - 2018 Edition: union, ‘static
-  - 2015 Edition: dyn
-  - 被保留的关键字不代表将来一定会使用
+    - 2018 Edition: union, ‘static
+    - 2015 Edition: dyn
+    - 被保留的关键字不代表将来一定会使用
 
 2. **标识符**
 
@@ -120,13 +120,13 @@ Rust 为面向表达式的语言，借鉴了函数式语言，面向表达式。
 
 - 分号表达式
 
-  - 单元类型（Unit Type）
+    - 单元类型（Unit Type）
 
-    `; -> ()`
+      `; -> ()`
 
 - 块表达式
 
-  - 块中最后一个表达式的值
+    - 块中最后一个表达式的值
 
 2. Rust 中的**求值规则**：
 
@@ -138,29 +138,29 @@ Rust 为面向表达式的语言，借鉴了函数式语言，面向表达式。
 
 ```Rust
 fn main() {
-  ;
-  ;
-  {
-    ()
-  }
-  {
+    ;
+    ;
+    {
+        ()
+    }
+    {
+        ();
+        use std::vec::Vec;
+    }
     ();
-    use std::vec::Vec;
-  }
-  ();
-  &{;}; // -> &()
-  ;     // -> ()
-  ;
+    &{;}; // -> &()
+    ;     // -> ()
+    ;
 }
 ```
 
 4. **另一种划分方式**
 
 - 基本语句
-  - 声明语句
-  - 表达式语句
+    - 声明语句
+    - 表达式语句
 - 表达式
-  - 块中最后一行不加分号的表达式
+    - 块中最后一行不加分号的表达式
 
 流程控制也是表达式。
 
@@ -188,10 +188,10 @@ Rust 中的 CTFE：
 
 ```rust
 fn main(){
-  let an = (42,).0;
-  const AN:i32 = an; // Error: attempt to use a non-constant value in a constant
-  // fixed error:
-  const AN:i32 = (42,).0;
+    let an = (42,).0;
+    const AN:i32 = an; // Error: attempt to use a non-constant value in a constant
+    // fixed error:
+    const AN:i32 = (42,).0;
 }
 ```
 
@@ -279,7 +279,7 @@ fn main() {
 ```rust
 // Error
 const fn hello()->String{
-  "Hello".to_string()
+    "Hello".to_string()
 }
 
 // Error
@@ -288,14 +288,14 @@ const S : String = hello();
 
 // Correct
 const fn hello()->&'static str{
-  "Hello"
+    "Hello"
 }
 
 // Correct
 const Y: &str = hello();
 
 fn main(){
-  println!("{:?}",S);
+    println!("{:?}",S);
 }
 ```
 
@@ -306,7 +306,7 @@ struct Answer(u32);
 const A:Answer = Answer(42);
 
 fn main(){
-  println!("{}",A);
+    println!("{}",A);
 }
 ```
 
@@ -327,7 +327,7 @@ const fn answer() -> u32 {42}
 const A:u32 = answer();
 
 fn main(){
-  let a = A;
+    let a = A;
 }
 ```
 
@@ -347,24 +347,24 @@ fn main(){
 
 ```rust
 fn main(){
-  let mut a;
-  while true{
-    a=1;
-    break;
-  }
-  
-  println!("{}",a); // Error
+    let mut a;
+    while true{
+        a=1;
+        break;
+    }
+
+    println!("{}",a); // Error
 }
 ```
 
 ```rust
 fn main(){
-  let mut a;
-  loop{
-    a = 1;
-    break;
-  }
-  println!("{}",a);
+    let mut a;
+    loop{
+        a = 1;
+        break;
+    }
+    println!("{}",a);
 }
 ```
 
@@ -422,16 +422,16 @@ impl<T,const N:usize> ArrayVec<T,{N}>{
             length:0,
         }
     }
-    
+
     #[inline]
     pub const fn len(&self) -> usize { self.length}
-    
+
     #[inline]
     pub const fn is_empty(&self) -> bool { self.len() == 0}
-    
+
     #[inline]
     pub const fn capacity(&self) -> usize { N}
-    
+
     #[inline]
     pub const fn is_full(&self) -> bool { self.len() >= self.capacity()}
 }
@@ -498,8 +498,8 @@ let b = &a;
 
 ```rust
 struct A{
-  name:&'static str,
-} 
+    name:&'static str,
+}
 
 let a = A{name:"Alex"};
 a.name;
@@ -533,9 +533,9 @@ a = 42;
 let dish = {"Ham","Eggs"};
 
 if let ("Bacon", b) = dish{ // 匹配表达式所在区域就是位置上下文
-		println!("Bacon is serverd with {}",b);
+println!("Bacon is serverd with {}",b);
 } else {
-    println!("No bacon will be served");
+println!("No bacon will be served");
 }
 
 // while let (位置上下文) = ... { ... }
@@ -605,3 +605,284 @@ println!("{:?}",answer); // 43
 可变引用也叫独占引用：
 
 ![image-20210314212741259](http://img.zhengyua.cn/20210314212741.png)
+
+## 数据类型
+
+### 基本数据类型
+
+![image-20210318172923252](http://img.zhengyua.cn/20210318172928.png)
+
+#### 字符串
+
+![image-20210318173149960](http://img.zhengyua.cn/20210318173150.png)
+
+字符串为实际存在的 UNIQUE 的字符，占四个字节。
+
+**根据字符串使用场景设计类型**：
+
+- 字面量
+- 动态可增长字符串
+- 从一段字符串中截取的片段
+- 字符串编码
+- FFi 中需要转换字符串到 C 或 OS 本地字符串
+- 遵循特定格式的文件路径
+
+字符类型众多就是为了保证覆盖到所有场景且为了保证类型安全。
+
+#### 字符串与切片
+
+**字符串为 UTF-8 编码的 u8 序列**。但 u8 序列切片并不一定是合法的字符串切牌呢。
+
+Rust 内存分配默认是在栈上分配内存，并且通过栈来管理堆内存，所以必须在编译期来确定类型的大小。但编译期不可能知道开发者字符串的长度，所以这里 str 类型是一个动态大小的类型。
+
+- str -> &str
+
+  这类引用被称为胖指针，它表示栈上存储一个指向静态区域或者是堆内存的指针。以及数据的长度，它比普通指针占用的空间更大，所以叫做胖指针。字符串可以存储于静态存储区，栈内存只存指针，所以它是一个静态引用字符串切片类型 。
+
+- [T] -> &[T]
+- String -> Vec<u8>
+
+#### 指针类型
+
+三种指针类型：
+
+1. 原始指针，`*mut T`和`*const T`；
+2. `NonNull`指针。它是 Rust 语言建议的 `*mut T`指针的替代指针。`NonNull`指针是非空指针，并且是遵循生命周期类型协变规则。
+3. 函数指针：函数指针是指向代码的指针，而非数据。可以使用它直接调用函数。
+
+#### 引用
+
+**两种引用类型**：
+
+1. `&T` 和 `&mut T`；
+2. 引用与指针的主要区别：
+    - 引用不可能为空；
+    - 拥有生命周期；
+    - 受借用检查器保护不会发生悬垂指针等问题；
+
+#### 元组
+
+**唯一的异构序列**：
+
+1. 不同长度的元组是不同类型；
+2. 单元类型的唯一实例等价于空元组；
+3. 当元组只有一个元素的时候，要在元素末尾加逗号分隔，以此方便和括号操作符区分开来。
+
+#### Never 类型
+
+> 为了保证类型安全就需要考虑所有可能的情况，所有也要考虑不可能返回值的计算情况。
+
+**代表的是不可能返回值的计算类型**：
+
+1. 类型理论中叫做底类型，底类型不包含任何值，但它可以合一到任何其他类型；
+2. Never 类型用`!`叹号表示；
+3. 目前还未稳定，但在 Rust 内部已经在使用了；
+
+### 自定义复合类型
+
+1. 结构体 Struct
+2. 枚举体 Enum
+3. 联合体 Union
+
+分别有具名结构体、元组结构体、单元结构体。
+
+```rust
+// 具名结构体，包含了字段
+struct Point{
+  x: f32,
+  y: f32,
+}
+
+// 元组结构体
+struct Pair(i32, f32);
+
+// 单元结构体
+struct Unit;
+
+fn main(){
+  let point = Point{x:1.0, y:2.0};
+  let pair = Pair(1, 2.0);
+  assert_eq!(pair.0, 1);
+  let unit1 = Uint;
+  let unit2 = Unit;
+}
+```
+
+当元组结构体只包含一个成员时：
+
+```rust
+struct Score(u32);
+
+impl Score{
+  fn pass(&self) -> bool{
+    self.0>=60
+  }
+}
+
+fn main(){
+  let s = Score(50);
+  assert_eq!(s.pass(), false)
+}
+```
+
+对于结构体内存布局方面，编译器会对结构体进行内存对齐，以此提升 CPU 的访问效率。使用内存布局属性可以指定 C 内存布局，防止编译器重排。
+
+```rust
+struct A{
+  a: u8,
+  b: u32,
+  c: u16,
+} 
+
+// 编译器重排字段，优化内存占用
+//struct A{
+//  a: u32,
+//  b: u16,
+//  c: u8,
+//} 
+// 8
+
+//#[repr(C)]
+//struct A{
+//  a: u8,
+//  b: u32,
+//  c: u16,
+//} 
+// 12
+
+
+fn main(){
+  println!("{:?}",std::mem::size_of::<A>()); // 8
+  let v = A{a:1, b:2, c:3 };
+}
+```
+
+枚举体与联合体内存布局中，以枚举类型成员最大的对齐值为准不需要为每个枚举值都对齐。
+
+```rust
+enum A {
+  One,
+  Two,
+}
+
+enum E {
+  N,
+  H(u32),
+  M(Box<u32>)
+}
+
+union U{
+  u: u32,
+  v: u64
+}
+
+fn main(){
+  println!("E: {:?}",std::mem::size_of::<A>()); // 1
+  println!("Box<u32>: {:?}",std::mem::size_of::<Box<u32>>()); // 8
+  println!("U: {:?}",std::mem::size_of::<E>()); // 16
+  println!("U: {:?}",std::mem::size_of::<U>()); // 8
+}
+```
+
+### 容器类型
+
+![image-20210318184719770](http://img.zhengyua.cn/20210318184719.png)
+
+#### 内部可变性（interior mutability）
+
+1. 与继承式可变相对应；
+2. 由可变性核心原语 UnsafeCell <T> 提供支持；
+3. 基于 UnsafeCell <T> 提供了 Cell<T> 和 RefCell<T>。
+
+#### Cell<T> & RefCell<T>
+
+```rust
+use std::cell::Cell;
+struct Foo {
+  x: u32,
+  y: Cell<u32>
+}
+
+fn main(){
+  let foo = Foo {x: 1, y: Cell::new(3)};
+  assert_eq!(1, foo.x);
+  assert_eq!(3, foo.y.get());
+  foo.y.set(5);
+  assert_eq!(5, foo.y.get());
+  
+  let s = "hello".to_string();
+  let bar = Cell::new(s);
+  let x = bar.into_inner();
+  // bar; // error: use of moved value: `bar`
+}
+```
+
+```rust
+use std::cell::RefCell;
+
+fn main(){
+  let x = RefCell::new(vec![1,2,3,4]);
+  println!("{:?}", x.borrow());
+  x.borrow_mut().push(5);
+  println!("{:?}", x.borrow());
+}
+```
+
+- 运行时借用检查
+
+![image-20210318185713594](http://img.zhengyua.cn/20210318185713.png)
+
+### 泛型
+
+所谓泛型就是参数化类型。
+
+``` rust
+fn foo<T>(x: T)->T{
+  return x;
+}
+
+fn main(){
+  assert_eq!(foo(1), 1);
+  assert_eq!(foo("hello"), "hello");
+}
+```
+
+- 静态分发
+
+```rust
+fn main(){
+  fn foo_1(x: i32)->i32{
+    return x;
+  }
+  fn foo_2(x:&'static' str)->&'static str{
+    return x;
+  }
+  foo_1(1);
+  foo_2("2");
+}
+```
+
+- 当类型推断失效，需要手工指定类型的时候使用
+
+```rust
+foo(1);
+//=
+foo::<i32>(1);
+
+foo("hello");
+//=
+foo::<&'static str>("hello");
+```
+
+
+
+
+
+
+
+### 特定类型
+
+所谓特定类型，是指专门有特殊用途的类型
+
+1. PhantomData <T>， 幻影类型。 一般用于 Unsafe Rust 的安全抽象。
+2. Pin<T>， 固定类型。为了支持异步开发而特意引进，防止被引用的值发生移动的类型。
