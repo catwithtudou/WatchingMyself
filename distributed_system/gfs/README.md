@@ -16,6 +16,7 @@ Better consistency -> low performance
 
 it can sum up the all thinking points like:
 
+
 - performance
 - fault tolerance
 - replication
